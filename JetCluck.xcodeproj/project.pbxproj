@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		201E1840302C558B00864A8C /* MyLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 201E183F302C558B00864A8C /* MyLibrary */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		F48449532FD81A6500E978C4 /* JetCluck.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JetCluck.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				201E1840302C558B00864A8C /* MyLibrary in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +83,7 @@
 			);
 			name = JetCluck;
 			packageProductDependencies = (
+				201E183F302C558B00864A8C /* MyLibrary */,
 			);
 			productName = JetCluck;
 			productReference = F48449532FD81A6500E978C4 /* JetCluck.app */;
@@ -107,6 +113,9 @@
 			);
 			mainGroup = F484494A2FD81A6500E978C4;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				201E183E302C558B00864A8C /* XCLocalSwiftPackageReference "MyLibrary" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F48449542FD81A6500E978C4 /* Products */;
 			projectDirPath = "";
@@ -264,6 +273,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = JetCluck/JetCluck.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Q7K5JZ585U;
@@ -303,6 +313,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = JetCluck/JetCluck.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Q7K5JZ585U;
@@ -359,6 +370,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		201E183E302C558B00864A8C /* XCLocalSwiftPackageReference "MyLibrary" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = MyLibrary;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		201E183F302C558B00864A8C /* MyLibrary */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MyLibrary;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F484494B2FD81A6500E978C4 /* Project object */;
 }
