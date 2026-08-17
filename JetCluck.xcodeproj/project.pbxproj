@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		201E1840302C558B00864A8C /* MyLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 201E183F302C558B00864A8C /* MyLibrary */; };
+		201E1840302C558B00864A8C /* JetCluckLaunchKit in Frameworks */ = {isa = PBXBuildFile; productRef = 201E183F302C558B00864A8C /* JetCluckLaunchKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,7 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				201E1840302C558B00864A8C /* MyLibrary in Frameworks */,
+				201E1840302C558B00864A8C /* JetCluckLaunchKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,7 +83,7 @@
 			);
 			name = JetCluck;
 			packageProductDependencies = (
-				201E183F302C558B00864A8C /* MyLibrary */,
+				201E183F302C558B00864A8C /* JetCluckLaunchKit */,
 			);
 			productName = JetCluck;
 			productReference = F48449532FD81A6500E978C4 /* JetCluck.app */;
@@ -114,7 +114,7 @@
 			mainGroup = F484494A2FD81A6500E978C4;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				201E183E302C558B00864A8C /* XCLocalSwiftPackageReference "MyLibrary" */,
+				201E183E302C558B00864A8C /* XCLocalSwiftPackageReference "JetCluckLaunchKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F48449542FD81A6500E978C4 /* Products */;
@@ -372,16 +372,16 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		201E183E302C558B00864A8C /* XCLocalSwiftPackageReference "MyLibrary" */ = {
+		201E183E302C558B00864A8C /* XCLocalSwiftPackageReference "JetCluckLaunchKit" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = MyLibrary;
+			relativePath = JetCluckLaunchKit;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		201E183F302C558B00864A8C /* MyLibrary */ = {
+		201E183F302C558B00864A8C /* JetCluckLaunchKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = MyLibrary;
+			productName = JetCluckLaunchKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

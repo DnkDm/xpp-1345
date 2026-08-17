@@ -1,20 +1,22 @@
 import SwiftUI
-import MyLibrary
+import JetCluckLaunchKit
 
 @main
 struct JetCluckApp: App {
-    @UIApplicationDelegateAdaptor(MyDAppDelegators.self) private var appDelegate
-
-    init() {
-        
-    }
+    @UIApplicationDelegateAdaptor(JetCluckLifecycleDelegate.self)
+    private var lifecycleDelegate
 
     var body: some Scene {
+        JetCluckWindowScene()
+    }
+}
+
+private struct JetCluckWindowScene: Scene {
+    var body: some Scene {
         WindowGroup {
-            Containers {
+            LaunchGateView {
                 ContentView()
             }
-            
         }
     }
 }
