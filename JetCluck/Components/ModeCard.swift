@@ -1,29 +1,57 @@
 import SwiftUI
 
-struct ModeCard: View {
-    let mode: GameMode
-    let best: Int
+/// One mode on a mode-picking screen. Both games fill it in, so a flight mode
+/// and a climb read the same way.
+struct ModeCard<Icon: View>: View {
+    let title: String
+    let tagline: String
+    let bestText: String
+    /// Nil keeps the drawn PLAY artwork, which already says FLY on it. A game
+    /// that is not flown passes its own verb instead.
+    var playLabel: String?
     let isUnlocked: Bool
+    let requirement: String
     let unlock: (value: Int, goal: Int)
     let action: () -> Void
+    @ViewBuilder private let icon: Icon
+
+    init(
+        title: String,
+        tagline: String,
+        bestText: String,
+        playLabel: String? = nil,
+        isUnlocked: Bool,
+        requirement: String,
+        unlock: (value: Int, goal: Int),
+        action: @escaping () -> Void,
+        @ViewBuilder icon: () -> Icon
+    ) {
+        self.title = title
+        self.tagline = tagline
+        self.bestText = bestText
+        self.playLabel = playLabel
+        self.isUnlocked = isUnlocked
+        self.requirement = requirement
+        self.unlock = unlock
+        self.action = action
+        self.icon = icon()
+    }
 
     var body: some View {
         VStack(spacing: 12) {
             HStack(alignment: .center, spacing: 14) {
-                Image(mode.iconAsset)
-                    .resizable()
-                    .scaledToFit()
+                icon
                     .frame(width: 58, height: 58)
                     .saturation(isUnlocked ? 1 : 0)
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(mode.title.uppercased())
+                    Text(title.uppercased())
                         .font(.cluck(24))
                         .foregroundStyle(AppPalette.brown)
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
 
-                    Text(mode.tagline)
+                    Text(tagline)
                         .font(.system(size: 14, weight: .bold, design: .rounded))
                         .foregroundStyle(AppPalette.ink.opacity(0.72))
                         .fixedSize(horizontal: false, vertical: true)
@@ -32,15 +60,21 @@ struct ModeCard: View {
             }
 
             if isUnlocked {
-                Text("BEST: \(best) \(mode.config.scoreUnit)")
+                Text(bestText.uppercased())
                     .font(.cluck(16))
                     .foregroundStyle(AppPalette.brown)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
 
-                FigmaImageButton(
-                    assetName: "CompactPlay",
-                    size: CGSize(width: 270, height: 54),
-                    action: action
-                )
+                if let playLabel {
+                    TicketButton(title: playLabel, compact: true, action: action)
+                } else {
+                    FigmaImageButton(
+                        assetName: "CompactPlay",
+                        size: CGSize(width: 270, height: 54),
+                        action: action
+                    )
+                }
             } else {
                 lockedFooter
             }
@@ -60,7 +94,7 @@ struct ModeCard: View {
             HStack(spacing: 8) {
                 LockGlyph()
                     .frame(width: 16, height: 20)
-                Text(mode.unlock.requirement)
+                Text(requirement)
                     .font(.cluck(14))
                     .foregroundStyle(AppPalette.brown)
                     .lineLimit(2)

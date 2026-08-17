@@ -1,7 +1,7 @@
 @preconcurrency import SpriteKit
 
 final class JetGameScene: SKScene, SKPhysicsContactDelegate {
-    private static let groundSegmentWidth: CGFloat = 600
+    private static let groundSegmentWidth = GroundArt.segmentWidth
     private static let magnetReach: CGFloat = 250
     private static let magnetSpeed: CGFloat = 520
 
@@ -224,53 +224,10 @@ final class JetGameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     private func makeGroundSegment(index: Int) -> SKNode {
-        let segment = SKNode()
+        let segment = GroundArt.makeSegment(index: index, world: world)
         segment.name = "movingGround"
-        segment.setScale(world)
-        segment.position.x = CGFloat(index) * Self.groundSegmentWidth * world
         segment.zPosition = -2
-
-        let path = CGMutablePath()
-        path.move(to: .zero)
-        path.addLine(to: CGPoint(x: 0, y: groundSurfaceY(at: 0)))
-        stride(from: CGFloat(8), to: Self.groundSegmentWidth, by: 8).forEach { x in
-            path.addLine(to: CGPoint(x: x, y: groundSurfaceY(at: x)))
-        }
-        path.addLine(
-            to: CGPoint(
-                x: Self.groundSegmentWidth,
-                y: groundSurfaceY(at: Self.groundSegmentWidth)
-            )
-        )
-        path.addLine(to: CGPoint(x: Self.groundSegmentWidth, y: 0))
-        path.closeSubpath()
-
-        let ground = SKShapeNode(path: path)
-        ground.fillColor = SKColor(red: 0.05, green: 0.64, blue: 0.43, alpha: 1)
-        ground.strokeColor = .clear
-        segment.addChild(ground)
-
-        for (treeIndex, x) in [CGFloat(88), 278, 482].enumerated() {
-            let tall = (treeIndex + index).isMultiple(of: 2)
-            let tree = SKSpriteNode(imageNamed: tall ? "GameTree2" : "GameTree1")
-            let scale = CGFloat.random(in: 0.86...1.08)
-            tree.size = tall
-                ? CGSize(width: 120 * scale, height: 180 * scale)
-                : CGSize(width: 120 * scale, height: 132 * scale)
-            tree.position = CGPoint(
-                x: x,
-                y: groundSurfaceY(at: x) - 14 + tree.size.height / 2
-            )
-            tree.zPosition = -1
-            segment.addChild(tree)
-        }
-
         return segment
-    }
-
-    private func groundSurfaceY(at x: CGFloat) -> CGFloat {
-        let phase = x / Self.groundSegmentWidth * .pi * 2
-        return 94 + sin(phase) * 27 + sin(phase * 2 + 0.55) * 8
     }
 
     private func moveScenery(by delta: TimeInterval) {

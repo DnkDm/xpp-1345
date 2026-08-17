@@ -28,6 +28,26 @@ struct StatsPanel: View {
                     )
                 }
             }
+
+            DashedDivider()
+
+            VStack(spacing: 11) {
+                Text("SKY HOP")
+                    .font(.cluck(17))
+                    .foregroundStyle(AppPalette.ticket)
+
+                ForEach(HopMode.allCases) { mode in
+                    row(
+                        title: mode.title,
+                        value: progress.isUnlocked(mode)
+                            ? "\(progress.best(mode)) M"
+                            : "LOCKED"
+                    )
+                }
+                row(title: "Climbs", value: "\(progress.hopRuns)")
+                row(title: "Clouds bounced", value: "\(progress.hopClouds)")
+                row(title: "Jet cans", value: "\(progress.hopCans)")
+            }
         }
         .padding(.vertical, 22)
         .padding(.horizontal, 24)

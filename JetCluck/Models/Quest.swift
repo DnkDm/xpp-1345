@@ -11,6 +11,10 @@ struct Quest: Identifiable {
         case totalSeconds
         case powerUps
         case modeScore(GameMode)
+        case bestHopHeight
+        case bestHopCoins
+        case hopRuns
+        case hopCans
     }
 
     let id: String

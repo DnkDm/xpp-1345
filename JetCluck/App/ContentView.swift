@@ -24,14 +24,21 @@ struct ContentView: View {
             case .menu:
                 MainMenuView(
                     progress: progress,
-                    onPlay: { route = .modeSelection },
+                    onPlay: { route = .gameHub },
                     onQuests: { route = .quests },
                     onShop: { route = .shop }
+                )
+            case .gameHub:
+                GameHubView(
+                    progress: progress,
+                    onBack: { route = .menu },
+                    onFlight: { route = .modeSelection },
+                    onSkyHop: { route = .skyHopModes }
                 )
             case .modeSelection:
                 ModeSelectionView(
                     progress: progress,
-                    onBack: { route = .menu },
+                    onBack: { route = .gameHub },
                     onPlay: { route = .game($0) }
                 )
             case .quests:
@@ -40,6 +47,19 @@ struct ContentView: View {
                 ShopView(progress: progress, onBack: { route = .menu })
             case .game(let mode):
                 GameScreen(
+                    mode: mode,
+                    progress: progress,
+                    onHome: { route = .menu }
+                )
+                .id(mode)
+            case .skyHopModes:
+                HopModeSelectionView(
+                    progress: progress,
+                    onBack: { route = .gameHub },
+                    onPlay: { route = .skyHop($0) }
+                )
+            case .skyHop(let mode):
+                HopGameScreen(
                     mode: mode,
                     progress: progress,
                     onHome: { route = .menu }

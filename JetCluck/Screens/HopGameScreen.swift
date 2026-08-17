@@ -1,48 +1,45 @@
 import SpriteKit
 import SwiftUI
 
-struct GameScreen: View {
-    let mode: GameMode
+struct HopGameScreen: View {
+    let mode: HopMode
     @ObservedObject var progress: ProgressStore
     let onHome: () -> Void
-    @StateObject private var session: GameSession
+    @StateObject private var session: HopSession
     @State private var bestBeforeRun = 0
     @State private var isNewBest = false
 
-    init(mode: GameMode, progress: ProgressStore, onHome: @escaping () -> Void) {
+    init(mode: HopMode, progress: ProgressStore, onHome: @escaping () -> Void) {
         self.mode = mode
         self.progress = progress
         self.onHome = onHome
         _session = StateObject(
-            wrappedValue: GameSession(
+            wrappedValue: HopSession(
                 mode: mode,
                 skinAssetName: progress.selectedSkin.assetName
             )
         )
     }
 
-    private var sky: Color { Color(hex: mode.config.skyHex) }
-
     var body: some View {
         ZStack {
-            sky
+            AppPalette.sky
                 .ignoresSafeArea()
 
             SpriteView(scene: session.scene, options: [.ignoresSiblingOrder])
                 .id(session.sceneID)
-                .background(sky)
                 .ignoresSafeArea()
 
             Color.clear
                 .contentShape(Rectangle())
                 .gesture(
                     DragGesture(minimumDistance: 0)
-                        .onChanged { _ in session.setThrusting(true) }
-                        .onEnded { _ in session.setThrusting(false) }
+                        .onChanged { session.steer(translation: $0.translation.width) }
+                        .onEnded { _ in session.endSteer() }
                 )
 
             VStack {
-                GameHUD(hud: session.hud, onPause: session.pause)
+                HopHUD(hud: session.hud, onPause: session.pause)
                 Spacer()
                 if session.state == .ready {
                     Text(mode.hint)
@@ -50,6 +47,7 @@ struct GameScreen: View {
                         .multilineTextAlignment(.center)
                         .foregroundStyle(.white)
                         .shadow(color: AppPalette.brown, radius: 0, x: 2, y: 3)
+                        .padding(.horizontal, 24)
                         .padding(.bottom, 90)
                 }
             }
@@ -67,13 +65,14 @@ struct GameScreen: View {
 
             if session.state == .finished, let stats = session.result {
                 ResultOverlay(
-                    sky: sky,
+                    sky: AppPalette.sky,
                     title: stats.outcome.title,
                     coins: stats.coins,
-                    scoreTitle: "Score",
-                    score: stats.score,
+                    scoreTitle: "Height",
+                    score: stats.height,
                     bestTitle: "\(mode.title) best",
-                    best: max(bestBeforeRun, stats.score),
+                    best: max(bestBeforeRun, stats.height),
+                    unit: "M",
                     isNewBest: isNewBest,
                     onRestart: restart,
                     onHome: onHome
@@ -85,7 +84,7 @@ struct GameScreen: View {
             session.onFinish = { stats in
                 isNewBest = progress.isNewBest(mode: mode, stats: stats)
                 bestBeforeRun = progress.best(mode)
-                progress.finishGame(mode: mode, stats: stats)
+                progress.finishHopRun(mode: mode, stats: stats)
             }
         }
         .onDisappear {

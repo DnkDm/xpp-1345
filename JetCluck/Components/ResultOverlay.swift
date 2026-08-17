@@ -1,14 +1,20 @@
 import SwiftUI
 
+/// End-of-run card. Both games fill it in, so a run always finishes the same
+/// way no matter which one the player was in.
 struct ResultOverlay: View {
-    let mode: GameMode
-    let stats: GameRunStats
+    let sky: Color
+    let title: String
+    let coins: Int
+    let scoreTitle: String
+    let score: Int
+    let bestTitle: String
     let best: Int
+    /// Appended to both numbers, for a game whose score is not just a count.
+    var unit: String?
     let isNewBest: Bool
     let onRestart: () -> Void
     let onHome: () -> Void
-
-    private var sky: Color { Color(hex: mode.config.skyHex) }
 
     var body: some View {
         GeometryReader { proxy in
@@ -31,10 +37,10 @@ struct ResultOverlay: View {
                 coinsEarned
                     .position(x: 195, y: 276)
 
-                resultValue(title: "Score", value: stats.score)
+                resultValue(title: scoreTitle, value: score)
                     .position(x: 195, y: 352)
 
-                resultValue(title: "\(mode.title) best", value: max(best, stats.score))
+                resultValue(title: bestTitle, value: best)
                     .position(x: 195, y: 488)
 
                 if isNewBest {
@@ -85,7 +91,7 @@ struct ResultOverlay: View {
                 .shadow(color: .black.opacity(0.24), radius: 4, y: 4)
                 .frame(width: 270, height: 74)
 
-            Text(stats.outcome.title.uppercased())
+            Text(title.uppercased())
                 .font(.cluck(36))
                 .foregroundStyle(AppPalette.brown)
                 .lineLimit(1)
@@ -102,7 +108,7 @@ struct ResultOverlay: View {
                 .scaledToFit()
                 .frame(width: 34, height: 34)
 
-            Text("+\(stats.coins)")
+            Text("+\(coins)")
                 .font(.cluck(22))
                 .foregroundStyle(AppPalette.brown)
                 .monospacedDigit()
@@ -134,10 +140,12 @@ struct ResultOverlay: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.65)
 
-            Text("\(value)")
+            Text(unit.map { "\(value) \($0)" } ?? "\(value)")
                 .font(.cluck(36))
                 .foregroundStyle(AppPalette.ticketHighlight)
                 .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.65)
                 .frame(width: 222, height: 58)
                 .background(
                     RoundedRectangle(cornerRadius: 16)

@@ -1,9 +1,9 @@
 import SwiftUI
 
-struct ModeSelectionView: View {
+struct HopModeSelectionView: View {
     @ObservedObject var progress: ProgressStore
     let onBack: () -> Void
-    let onPlay: (GameMode) -> Void
+    let onPlay: (HopMode) -> Void
 
     var body: some View {
         ZStack {
@@ -22,8 +22,6 @@ struct ModeSelectionView: View {
                             }
                         }
                         .frame(maxWidth: .infinity)
-                        // On iPad the cards no longer fill the screen, so they
-                        // sit in the middle instead of hugging the header.
                         .frame(
                             minHeight: DeviceLayout.isPad
                                 ? proxy.size.height - ScreenHeader.height - 56
@@ -39,7 +37,7 @@ struct ModeSelectionView: View {
             .ignoresSafeArea()
 
             ScreenHeader(
-                title: "Choose Flight",
+                title: "Choose Climb",
                 coins: progress.coins,
                 onBack: onBack
             )
@@ -52,7 +50,7 @@ struct ModeSelectionView: View {
 
     private var column: some View {
         LazyVStack(spacing: 18) {
-            ForEach(GameMode.allCases) { mode in
+            ForEach(HopMode.allCases) { mode in
                 card(for: mode)
             }
         }
@@ -64,7 +62,7 @@ struct ModeSelectionView: View {
             columns: [GridItem(.adaptive(minimum: 340, maximum: 420), spacing: 20)],
             spacing: 20
         ) {
-            ForEach(GameMode.allCases) { mode in
+            ForEach(HopMode.allCases) { mode in
                 card(for: mode)
             }
         }
@@ -72,19 +70,58 @@ struct ModeSelectionView: View {
         .frame(maxWidth: 900)
     }
 
-    private func card(for mode: GameMode) -> some View {
+    private func card(for mode: HopMode) -> some View {
         ModeCard(
             title: mode.title,
             tagline: mode.tagline,
-            bestText: "Best: \(progress.best(mode)) \(mode.config.scoreUnit)",
+            bestText: "Best: \(progress.best(mode)) m",
+            playLabel: "Hop",
             isUnlocked: progress.isUnlocked(mode),
             requirement: mode.unlock.requirement,
             unlock: progress.unlockProgress(for: mode),
             action: { onPlay(mode) }
         ) {
-            Image(mode.iconAsset)
+            HopModeGlyph(mode: mode, skin: progress.selectedSkin)
+        }
+    }
+}
+
+/// Each climb is introduced by the thing that sets it apart: the chicken on a
+/// cloud, an empty sky, a crossed-out jet can, a drone.
+private struct HopModeGlyph: View {
+    let mode: HopMode
+    let skin: ChickenSkin
+
+    var body: some View {
+        switch mode {
+        case .classic:
+            SkyHopGlyph(skin: skin)
+        case .cruise:
+            CloudGlyph()
+        case .pure:
+            crossedOutCan
+        case .storm:
+            Image("DroneObstacle")
                 .resizable()
                 .scaledToFit()
+        }
+    }
+
+    /// The same struck-through mark the menu uses for a switched-off setting.
+    private var crossedOutCan: some View {
+        GeometryReader { proxy in
+            let side = min(proxy.size.width, proxy.size.height)
+
+            Image("Fuel")
+                .resizable()
+                .scaledToFit()
+                .frame(width: proxy.size.width, height: proxy.size.height)
+                .overlay {
+                    Capsule()
+                        .fill(AppPalette.brown)
+                        .frame(width: side * 0.94, height: side * 0.11)
+                        .rotationEffect(.degrees(-45))
+                }
         }
     }
 }

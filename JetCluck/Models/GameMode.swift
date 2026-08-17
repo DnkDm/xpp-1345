@@ -139,6 +139,7 @@ enum UnlockRule {
     case always
     case score(GameMode, Int)
     case totalCoins(Int)
+    case hopHeight(Int)
 
     var requirement: String {
         switch self {
@@ -148,6 +149,8 @@ enum UnlockRule {
             "Reach \(value) \(mode.config.scoreUnit) in \(mode.title.uppercased())"
         case .totalCoins(let value):
             "Collect \(value) coins in total"
+        case .hopHeight(let value):
+            "Climb \(value) m in SKY HOP"
         }
     }
 }

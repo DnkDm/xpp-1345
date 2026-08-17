@@ -61,12 +61,3 @@ private struct MagnetTipsShape: Shape {
         return path.flipped(in: rect)
     }
 }
-
-private extension CGPath {
-    /// Moves an origin-centred, Y-up path into a SwiftUI rect.
-    func flipped(in rect: CGRect) -> Path {
-        Path(self)
-            .applying(CGAffineTransform(scaleX: 1, y: -1))
-            .offsetBy(dx: rect.midX, dy: rect.midY)
-    }
-}

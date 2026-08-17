@@ -14,6 +14,12 @@ struct ProgressSnapshot: Codable {
     let bestBirdStreak: Int
     let bestDroneStreak: Int
     let powerUpsCollected: Int
+    let bestHopHeight: Int
+    let hopBestScores: [String: Int]
+    let bestHopCoins: Int
+    let hopRuns: Int
+    let hopClouds: Int
+    let hopCans: Int
     let unlockedSkinIDs: [String]
     let claimedQuestIDs: [String]
     let selectedSkinID: String
@@ -32,6 +38,12 @@ struct ProgressSnapshot: Codable {
         bestBirdStreak: Int,
         bestDroneStreak: Int,
         powerUpsCollected: Int,
+        bestHopHeight: Int,
+        hopBestScores: [String: Int],
+        bestHopCoins: Int,
+        hopRuns: Int,
+        hopClouds: Int,
+        hopCans: Int,
         unlockedSkinIDs: [String],
         claimedQuestIDs: [String],
         selectedSkinID: String,
@@ -51,6 +63,12 @@ struct ProgressSnapshot: Codable {
         self.bestBirdStreak = bestBirdStreak
         self.bestDroneStreak = bestDroneStreak
         self.powerUpsCollected = powerUpsCollected
+        self.bestHopHeight = bestHopHeight
+        self.hopBestScores = hopBestScores
+        self.bestHopCoins = bestHopCoins
+        self.hopRuns = hopRuns
+        self.hopClouds = hopClouds
+        self.hopCans = hopCans
         self.unlockedSkinIDs = unlockedSkinIDs
         self.claimedQuestIDs = claimedQuestIDs
         self.selectedSkinID = selectedSkinID
@@ -71,6 +89,13 @@ struct ProgressSnapshot: Codable {
         bestBirdStreak = try values.decodeIfPresent(Int.self, forKey: .bestBirdStreak) ?? 0
         bestDroneStreak = try values.decodeIfPresent(Int.self, forKey: .bestDroneStreak) ?? 0
         powerUpsCollected = try values.decodeIfPresent(Int.self, forKey: .powerUpsCollected) ?? 0
+        // Saves made before Sky Hop shipped simply start it at zero.
+        bestHopHeight = try values.decodeIfPresent(Int.self, forKey: .bestHopHeight) ?? 0
+        hopBestScores = try values.decodeIfPresent([String: Int].self, forKey: .hopBestScores) ?? [:]
+        bestHopCoins = try values.decodeIfPresent(Int.self, forKey: .bestHopCoins) ?? 0
+        hopRuns = try values.decodeIfPresent(Int.self, forKey: .hopRuns) ?? 0
+        hopClouds = try values.decodeIfPresent(Int.self, forKey: .hopClouds) ?? 0
+        hopCans = try values.decodeIfPresent(Int.self, forKey: .hopCans) ?? 0
         unlockedSkinIDs = try values.decodeIfPresent([String].self, forKey: .unlockedSkinIDs) ?? ["classic"]
         claimedQuestIDs = try values.decodeIfPresent([String].self, forKey: .claimedQuestIDs) ?? []
         selectedSkinID = try values.decodeIfPresent(String.self, forKey: .selectedSkinID) ?? "classic"

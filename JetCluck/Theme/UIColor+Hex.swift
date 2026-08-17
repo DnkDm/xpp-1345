@@ -13,4 +13,19 @@ extension UIColor {
             alpha: 1
         )
     }
+
+    /// Straight RGB mix, used to fade the Sky Hop sky from day to night.
+    func blended(with other: UIColor, amount: CGFloat) -> UIColor {
+        let fraction = min(max(amount, 0), 1)
+        var (red, green, blue, alpha): (CGFloat, CGFloat, CGFloat, CGFloat) = (0, 0, 0, 0)
+        var (otherRed, otherGreen, otherBlue, otherAlpha): (CGFloat, CGFloat, CGFloat, CGFloat) = (0, 0, 0, 0)
+        getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        other.getRed(&otherRed, green: &otherGreen, blue: &otherBlue, alpha: &otherAlpha)
+        return UIColor(
+            red: red + (otherRed - red) * fraction,
+            green: green + (otherGreen - green) * fraction,
+            blue: blue + (otherBlue - blue) * fraction,
+            alpha: alpha + (otherAlpha - alpha) * fraction
+        )
+    }
 }

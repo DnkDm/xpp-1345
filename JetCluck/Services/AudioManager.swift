@@ -17,7 +17,8 @@ final class AudioManager: NSObject, ObservableObject {
     private var missingFiles: Set<String> = []
     private var appIsActive = true
     private var musicEnabled = true
-    private var soundEnabled = true
+    /// Read by `Haptics`, so turning the sound off also stills the taps.
+    private(set) var soundEnabled = true
 
     private override init() {
         super.init()

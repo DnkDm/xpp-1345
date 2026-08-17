@@ -14,6 +14,12 @@ final class ProgressStore: ObservableObject {
     @Published private(set) var bestBirdStreak = 0
     @Published private(set) var bestDroneStreak = 0
     @Published private(set) var powerUpsCollected = 0
+    @Published private(set) var bestHopHeight = 0
+    @Published private(set) var hopBestScores: [String: Int] = [:]
+    @Published private(set) var bestHopCoins = 0
+    @Published private(set) var hopRuns = 0
+    @Published private(set) var hopClouds = 0
+    @Published private(set) var hopCans = 0
     @Published private(set) var unlockedSkinIDs: Set<String> = ["classic"]
     @Published private(set) var claimedQuestIDs: Set<String> = []
     @Published var selectedSkinID = "classic" { didSet { save() } }
@@ -26,6 +32,8 @@ final class ProgressStore: ObservableObject {
         Quest(id: "drone3", title: "Avoid 5 drones\nin a row", goal: 5, reward: 10, metric: .bestDroneStreak),
         Quest(id: "skin2", title: "Buy your first skin", goal: 2, reward: 10, metric: .skins),
         Quest(id: "play10", title: "Finish 10 flights", goal: 10, reward: 15, metric: .gamesPlayed),
+        Quest(id: "hop40", title: "Climb 40m\nin Sky Hop", goal: 40, reward: 15, metric: .bestHopHeight),
+        Quest(id: "hopCoin12", title: "Collect 12 coins\nin one climb", goal: 12, reward: 20, metric: .bestHopCoins),
         Quest(id: "sec30", title: "Fly for 45 seconds", goal: 45, reward: 20, metric: .bestFlightSeconds),
         Quest(id: "fuel10", title: "Collect 12 fuel\ncans in one run", goal: 12, reward: 20, metric: .bestFuelCans),
         Quest(id: "bird5", title: "Pass 10 birds\nwithout a touch", goal: 10, reward: 20, metric: .bestBirdStreak),
@@ -36,12 +44,16 @@ final class ProgressStore: ObservableObject {
         Quest(id: "rush45", title: "Last 45 seconds\nin Rush Hour", goal: 45, reward: 30, metric: .modeScore(.rush)),
         Quest(id: "gold25", title: "Bank 25 coins\nin Coin Rush", goal: 25, reward: 30, metric: .modeScore(.coinRush)),
         Quest(id: "time10", title: "Spend 10 minutes\nin the air", goal: 600, reward: 30, metric: .totalSeconds),
+        Quest(id: "hop90", title: "Climb 90m\nin Sky Hop", goal: 90, reward: 30, metric: .bestHopHeight),
+        Quest(id: "hopCan10", title: "Grab 10 jet cans\nin Sky Hop", goal: 10, reward: 30, metric: .hopCans),
         Quest(id: "sec120", title: "Fly for 180 seconds", goal: 180, reward: 50, metric: .bestFlightSeconds),
         Quest(id: "coin100", title: "Collect 250 coins\nin total", goal: 250, reward: 50, metric: .totalCoins),
         Quest(id: "skin10", title: "Unlock 12 skins", goal: 12, reward: 50, metric: .skins),
         Quest(id: "drone10", title: "Avoid 20 drones\nin a row", goal: 20, reward: 50, metric: .bestDroneStreak),
         Quest(id: "bird20", title: "Pass 35 birds\nwithout a touch", goal: 35, reward: 50, metric: .bestBirdStreak),
         Quest(id: "play50", title: "Finish 50 flights", goal: 50, reward: 50, metric: .gamesPlayed),
+        Quest(id: "hopRuns20", title: "Finish 20\nSky Hop climbs", goal: 20, reward: 50, metric: .hopRuns),
+        Quest(id: "hop200", title: "Climb 200m\nin Sky Hop", goal: 200, reward: 60, metric: .bestHopHeight),
         Quest(id: "power40", title: "Grab 40 power-ups", goal: 40, reward: 50, metric: .powerUps),
         Quest(id: "night30", title: "Survive 30 seconds\nin Night Storm", goal: 30, reward: 60, metric: .modeScore(.nightmare)),
         Quest(id: "gold60", title: "Bank 60 coins\nin Coin Rush", goal: 60, reward: 60, metric: .modeScore(.coinRush)),
@@ -71,11 +83,23 @@ final class ProgressStore: ObservableObject {
         bestScores[mode.rawValue] ?? 0
     }
 
+    func best(_ mode: HopMode) -> Int {
+        hopBestScores[mode.rawValue] ?? 0
+    }
+
     func isUnlocked(_ mode: GameMode) -> Bool {
         unlockValue(for: mode.unlock) >= unlockGoal(for: mode.unlock)
     }
 
+    func isUnlocked(_ mode: HopMode) -> Bool {
+        unlockValue(for: mode.unlock) >= unlockGoal(for: mode.unlock)
+    }
+
     func unlockProgress(for mode: GameMode) -> (value: Int, goal: Int) {
+        (unlockValue(for: mode.unlock), unlockGoal(for: mode.unlock))
+    }
+
+    func unlockProgress(for mode: HopMode) -> (value: Int, goal: Int) {
         (unlockValue(for: mode.unlock), unlockGoal(for: mode.unlock))
     }
 
@@ -92,6 +116,10 @@ final class ProgressStore: ObservableObject {
         case .totalSeconds: totalSeconds
         case .powerUps: powerUpsCollected
         case .modeScore(let mode): best(mode)
+        case .bestHopHeight: bestHopHeight
+        case .bestHopCoins: bestHopCoins
+        case .hopRuns: hopRuns
+        case .hopCans: hopCans
         }
     }
 
@@ -112,6 +140,25 @@ final class ProgressStore: ObservableObject {
         bestBirdStreak = max(bestBirdStreak, stats.birdStreak)
         bestDroneStreak = max(bestDroneStreak, stats.droneStreak)
         bestScores[mode.rawValue] = max(best(mode), stats.score)
+        save()
+    }
+
+    /// True when the climb beat the stored best for its mode.
+    func isNewBest(mode: HopMode, stats: HopRunStats) -> Bool {
+        stats.height > best(mode)
+    }
+
+    /// Sky Hop keeps its own records, but pays into the same purse - coins
+    /// earned up in the clouds buy skins in the shop.
+    func finishHopRun(mode: HopMode, stats: HopRunStats) {
+        hopRuns += 1
+        hopBestScores[mode.rawValue] = max(best(mode), stats.height)
+        hopClouds += stats.clouds
+        hopCans += stats.cans
+        coins += stats.coins
+        totalCoinsCollected += stats.coins
+        bestHopHeight = max(bestHopHeight, stats.height)
+        bestHopCoins = max(bestHopCoins, stats.coins)
         save()
     }
 
@@ -138,6 +185,7 @@ final class ProgressStore: ObservableObject {
         case .always: 1
         case .score(let mode, _): best(mode)
         case .totalCoins: totalCoinsCollected
+        case .hopHeight: bestHopHeight
         }
     }
 
@@ -146,6 +194,7 @@ final class ProgressStore: ObservableObject {
         case .always: 1
         case .score(_, let value): value
         case .totalCoins(let value): value
+        case .hopHeight(let value): value
         }
     }
 
@@ -165,6 +214,12 @@ final class ProgressStore: ObservableObject {
         bestBirdStreak = snapshot.bestBirdStreak
         bestDroneStreak = snapshot.bestDroneStreak
         powerUpsCollected = snapshot.powerUpsCollected
+        bestHopHeight = snapshot.bestHopHeight
+        hopBestScores = snapshot.hopBestScores
+        bestHopCoins = snapshot.bestHopCoins
+        hopRuns = snapshot.hopRuns
+        hopClouds = snapshot.hopClouds
+        hopCans = snapshot.hopCans
         unlockedSkinIDs = Set(snapshot.unlockedSkinIDs)
         claimedQuestIDs = Set(snapshot.claimedQuestIDs)
         selectedSkinID = snapshot.selectedSkinID
@@ -186,6 +241,12 @@ final class ProgressStore: ObservableObject {
             bestBirdStreak: bestBirdStreak,
             bestDroneStreak: bestDroneStreak,
             powerUpsCollected: powerUpsCollected,
+            bestHopHeight: bestHopHeight,
+            hopBestScores: hopBestScores,
+            bestHopCoins: bestHopCoins,
+            hopRuns: hopRuns,
+            hopClouds: hopClouds,
+            hopCans: hopCans,
             unlockedSkinIDs: Array(unlockedSkinIDs),
             claimedQuestIDs: Array(claimedQuestIDs),
             selectedSkinID: selectedSkinID,
